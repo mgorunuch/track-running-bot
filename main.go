@@ -141,6 +141,11 @@ func distanceStats(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 func main() {
 	var err error
 
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		log.Fatalln("$PORT is required")
+	}
+
 	url, ok := os.LookupEnv("DATABASE_URL")
 	if !ok {
 		log.Fatalln("$DATABASE_URL is required")
@@ -202,7 +207,7 @@ func main() {
 	}()
 
 	http.HandleFunc("/", hello)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+port, nil)
 }
 
 func hello(w http.ResponseWriter, req *http.Request) {
