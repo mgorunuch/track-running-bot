@@ -192,10 +192,16 @@ func main() {
 			}
 
 			switch {
+			case strings.HasPrefix(update.Message.Text, "/new"):
+				registerDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/register_distance"):
 				registerDistance(update, bot, db)
+			case strings.HasPrefix(update.Message.Text, "/delete"):
+				removeDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/remove_distance"):
 				removeDistance(update, bot, db)
+			case strings.HasPrefix(update.Message.Text, "/my"):
+				myDistance(update, bot)
 			case strings.HasPrefix(update.Message.Text, "/my_distance"):
 				myDistance(update, bot)
 			case strings.HasPrefix(update.Message.Text, "/stats"):
