@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 
@@ -34,6 +35,12 @@ var store = map[int]float64{}
 var names = map[int]string{}
 
 const goal float64 = 200.0
+
+var goalEnd = time.Date(2020, 12, 31, 23, 59, 59, 0, time.UTC)
+
+func leftDays() int {
+	return int(goalEnd.Sub(time.Now()).Hours() / 24)
+}
 
 func registerDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	fromID := update.Message.From.ID
@@ -70,7 +77,7 @@ func registerDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) 
 
 	currNum := store[fromID]
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, registerMessageDistanceMsg(numb, currNum, goal))
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, registerMessageDistanceMsg(numb, currNum, goal, leftDays()))
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
 
@@ -108,7 +115,7 @@ func removeDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 
 	currNum := store[fromID]
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, removeMessageDistanceMsg(numb, currNum, goal))
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, removeMessageDistanceMsg(numb, currNum, goal, leftDays()))
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
 
@@ -123,7 +130,7 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 		currDistance = v
 	}
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, myMessageDistanceMsg(currDistance, goal))
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, myMessageDistanceMsg(currDistance, goal, leftDays()))
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
 
@@ -131,7 +138,7 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 }
 
 func distanceStats(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, statsMessageDistanceMsg(store, names, goal))
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, statsMessageDistanceMsg(store, names, goal, leftDays()))
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
 
