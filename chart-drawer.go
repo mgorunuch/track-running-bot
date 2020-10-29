@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"time"
 
+	"github.com/wcharczuk/go-chart/drawing"
+
 	"github.com/wcharczuk/go-chart"
 )
 
 func runningDistanceToDayKm(ri []RunningItem, startDate time.Time, endDate time.Time) []float64 {
-	var maxDate time.Time
+	now := time.Now()
 	riMap := map[time.Time]float64{}
 	for _, r := range ri {
 		y, m, d := r.createdAt.Date()
@@ -19,16 +21,12 @@ func runningDistanceToDayKm(ri []RunningItem, startDate time.Time, endDate time.
 		}
 
 		riMap[cAt] += r.distance
-
-		if cAt.After(maxDate) {
-			maxDate = cAt
-		}
 	}
 
 	res := make([]float64, 0)
 
 	fTime := startDate
-	for !fTime.After(endDate) && !fTime.After(maxDate) {
+	for !fTime.After(endDate) && !fTime.After(now) {
 		var val = 0.0
 		if v, ok := riMap[fTime]; ok {
 			val = v
@@ -42,7 +40,7 @@ func runningDistanceToDayKm(ri []RunningItem, startDate time.Time, endDate time.
 	return res
 }
 
-func drawChart(goalKm, totalDays uint, daysKm []float64) (*bytes.Buffer, error) {
+func drawChart(goalKm, totalDays uint, daysKm [][]float64) (*bytes.Buffer, error) {
 	defaultChartData := chart.ContinuousSeries{
 		Name: "Chart name",
 	}
@@ -53,25 +51,40 @@ func drawChart(goalKm, totalDays uint, daysKm []float64) (*bytes.Buffer, error) 
 	chart1.Style.StrokeColor = chart.ColorRed
 	chart1.Style.Show = true
 
-	xVals := make([]float64, 0, totalDays)
-	yVals := make([]float64, 0, totalDays)
-
-	xVals = append(xVals, 0)
-	yVals = append(yVals, daysKm[0])
-
-	for i := 1; i < len(daysKm); i++ {
-		xVals = append(xVals, float64(i))
-		yVals = append(yVals, yVals[i-1]+daysKm[i])
+	colors := map[int]drawing.Color{
+		0: chart.ColorBlue,
+		1: chart.ColorGreen,
+		2: chart.ColorCyan,
+		3: chart.ColorOrange,
 	}
 
-	chart2 := defaultChartData
-	chart2.YValues = yVals
-	chart2.XValues = xVals
-	chart2.Style.Show = true
-	chart2.Style.StrokeWidth = 2
-	chart2.Style.StrokeColor = chart.ColorBlue
-	chart2.Style.DotWidth = 3
-	chart2.Style.DotColor = chart.ColorBlue
+	resCharts := make([]chart.Series, len(daysKm))
+	for j, c := range daysKm {
+		xVals := make([]float64, 0, totalDays)
+		yVals := make([]float64, 0, totalDays)
+
+		xVals = append(xVals, 0)
+		yVals = append(yVals, c[0])
+
+		for i := 1; i < len(c); i++ {
+			xVals = append(xVals, float64(i))
+			yVals = append(yVals, yVals[i-1]+c[i])
+		}
+
+		chart2 := defaultChartData
+		chart2.YValues = yVals
+		chart2.XValues = xVals
+		chart2.Style.Show = true
+		chart2.Style.StrokeWidth = 2
+		chart2.Style.DotWidth = 3
+
+		if v, ok := colors[j]; ok {
+			chart2.Style.StrokeColor = v
+			chart2.Style.DotColor = v
+		}
+
+		resCharts[j] = chart2
+	}
 
 	graph := chart.Chart{
 		Title: "Your running progress",
@@ -103,9 +116,12 @@ func drawChart(goalKm, totalDays uint, daysKm []float64) (*bytes.Buffer, error) 
 		Font:           nil,
 		Series: []chart.Series{
 			chart1,
-			chart2,
 		},
 		Elements: nil,
+	}
+
+	for _, c := range resCharts {
+		graph.Series = append(graph.Series, c)
 	}
 
 	buffer := bytes.NewBuffer([]byte{})

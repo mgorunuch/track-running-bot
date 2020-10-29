@@ -144,7 +144,7 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	}
 
 	daysKm := runningDistanceToDayKm(dt, startDate, goalEnd)
-	buffer, err := drawChart(uint(goal), uint(goalEnd.Sub(startDate).Hours()/24), daysKm)
+	buffer, err := drawChart(uint(goal), uint(goalEnd.Sub(startDate).Hours()/24), [][]float64{daysKm})
 	if err != nil {
 		bot.Send(msg)
 		fmt.Printf("%+v", err)
@@ -173,12 +173,52 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	fmt.Printf("%+v", res)
 }
 
-func distanceStats(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
+func distanceStats(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, statsMessageDistanceMsg(store, names, goal, leftDays()))
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
 
-	bot.Send(msg)
+	dat := make([][]float64, 0, len(store))
+	for k := range store {
+		dt, err := getSingleUserData(db, k)
+		if err != nil {
+			bot.Send(msg)
+			fmt.Printf("%+v", err)
+
+			return
+		}
+
+		daysKm := runningDistanceToDayKm(dt, startDate, goalEnd)
+		dat = append(dat, daysKm)
+	}
+
+	buffer, err := drawChart(uint(goal), uint(goalEnd.Sub(startDate).Hours()/24), dat)
+	if err != nil {
+		bot.Send(msg)
+		fmt.Printf("%+v", err)
+
+		return
+	}
+
+	bts := tgbotapi.FileBytes{
+		Name:  time.Now().String() + ".png",
+		Bytes: buffer.Bytes(),
+	}
+
+	res, err := bot.UploadFile("sendPhoto", map[string]string{
+		"chat_id":             fmt.Sprint(msg.ChatID),
+		"caption":             msg.Text,
+		"parse_mode":          msg.ParseMode,
+		"reply_to_message_id": fmt.Sprint(msg.ReplyToMessageID),
+	}, "photo", bts)
+	if err != nil {
+		bot.Send(msg)
+		fmt.Printf("%+v", err)
+
+		return
+	}
+
+	fmt.Printf("%+v", res)
 }
 
 func main() {
@@ -248,7 +288,7 @@ func main() {
 			case strings.HasPrefix(update.Message.Text, "/my_distance"):
 				myDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/stats"):
-				distanceStats(update, bot)
+				distanceStats(update, bot, db)
 			}
 
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
