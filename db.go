@@ -1,6 +1,10 @@
 package main
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+	"time"
+)
 
 func connect(dbURL string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", dbURL)
@@ -48,6 +52,43 @@ func refreshData(db *sql.DB) error {
 	}
 
 	return nil
+}
+
+type RunningItem struct {
+	createdAt time.Time
+	distance  float64
+}
+
+func getSingleUserData(db *sql.DB, tgID int) ([]RunningItem, error) {
+	rows, err := db.Query(`select created_at, distance from data where telegram_id = ` + fmt.Sprint(tgID))
+	if err != nil {
+		return nil, err
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	dt := make([]RunningItem, 0)
+
+	for rows.Next() {
+		var (
+			dist      float64
+			createdAt time.Time
+		)
+
+		err = rows.Scan(&createdAt, &dist)
+		if err != nil {
+			return nil, err
+		}
+
+		dt = append(dt, RunningItem{
+			createdAt: createdAt,
+			distance:  dist,
+		})
+	}
+
+	return dt, nil
 }
 
 func insertData(db *sql.DB, id int, distance float64, name string) error {

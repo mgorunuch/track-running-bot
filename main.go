@@ -36,7 +36,8 @@ var names = map[int]string{}
 
 const goal float64 = 200.0
 
-var goalEnd = time.Date(2020, 12, 31, 23, 59, 59, 0, time.UTC)
+var startDate = time.Date(2020, 10, 15, 0, 0, 0, 0, time.UTC)
+var goalEnd = time.Date(2020, 10, 15, 0, 0, 0, 0, time.UTC)
 
 func leftDays() int {
 	return int(goalEnd.Sub(time.Now()).Hours() / 24)
@@ -122,7 +123,7 @@ func removeDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	bot.Send(msg)
 }
 
-func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
+func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	fromID := update.Message.From.ID
 
 	currDistance := 0.0
@@ -134,7 +135,37 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
 
-	bot.Send(msg)
+	dt, err := getSingleUserData(db, fromID)
+	if err != nil {
+		bot.Send(msg)
+
+		return
+	}
+
+	daysKm := runningDistanceToDayKm(dt, startDate, goalEnd)
+	buffer, err := drawChart(uint(goal), uint(goalEnd.Sub(startDate).Hours()/24), daysKm)
+	if err != nil {
+		bot.Send(msg)
+
+		return
+	}
+
+	bts := tgbotapi.FileBytes{
+		Name:  time.Now().String() + ".png",
+		Bytes: buffer.Bytes(),
+	}
+
+	_, err = bot.UploadFile("sendPhoto", map[string]string{
+		"chat_id":             "73420519",
+		"caption":             msg.Text,
+		"parse_mode":          msg.ParseMode,
+		"reply_to_message_id": fmt.Sprint(msg.ReplyToMessageID),
+	}, "photo", bts)
+	if err != nil {
+		bot.Send(msg)
+
+		return
+	}
 }
 
 func distanceStats(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
@@ -208,9 +239,9 @@ func main() {
 			case strings.HasPrefix(update.Message.Text, "/remove_distance"):
 				removeDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/my"):
-				myDistance(update, bot)
+				myDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/my_distance"):
-				myDistance(update, bot)
+				myDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/stats"):
 				distanceStats(update, bot)
 			}
