@@ -138,6 +138,7 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	dt, err := getSingleUserData(db, fromID)
 	if err != nil {
 		bot.Send(msg)
+		fmt.Printf("%+v", err)
 
 		return
 	}
@@ -146,6 +147,7 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	buffer, err := drawChart(uint(goal), uint(goalEnd.Sub(startDate).Hours()/24), daysKm)
 	if err != nil {
 		bot.Send(msg)
+		fmt.Printf("%+v", err)
 
 		return
 	}
@@ -155,7 +157,7 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 		Bytes: buffer.Bytes(),
 	}
 
-	_, err = bot.UploadFile("sendPhoto", map[string]string{
+	res, err := bot.UploadFile("sendPhoto", map[string]string{
 		"chat_id":             "73420519",
 		"caption":             msg.Text,
 		"parse_mode":          msg.ParseMode,
@@ -163,9 +165,12 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	}, "photo", bts)
 	if err != nil {
 		bot.Send(msg)
+		fmt.Printf("%+v", err)
 
 		return
 	}
+
+	fmt.Printf("%+v", res)
 }
 
 func distanceStats(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
