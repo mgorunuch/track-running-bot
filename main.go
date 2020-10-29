@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-
 	_ "github.com/lib/pq"
 )
 
@@ -37,7 +37,7 @@ var names = map[int]string{}
 const goal float64 = 200.0
 
 var startDate = time.Date(2020, 10, 15, 0, 0, 0, 0, time.UTC)
-var goalEnd = time.Date(2020, 10, 15, 0, 0, 0, 0, time.UTC)
+var goalEnd = time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
 
 func leftDays() int {
 	return int(goalEnd.Sub(time.Now()).Hours() / 24)
@@ -158,7 +158,7 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	}
 
 	res, err := bot.UploadFile("sendPhoto", map[string]string{
-		"chat_id":             "73420519",
+		"chat_id":             fmt.Sprint(msg.ChatID),
 		"caption":             msg.Text,
 		"parse_mode":          msg.ParseMode,
 		"reply_to_message_id": fmt.Sprint(msg.ReplyToMessageID),

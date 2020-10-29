@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/wcharczuk/go-chart"
-	"github.com/wcharczuk/go-chart/drawing"
 )
 
 func runningDistanceToDayKm(ri []RunningItem, startDate time.Time, endDate time.Time) []float64 {
@@ -37,7 +36,7 @@ func runningDistanceToDayKm(ri []RunningItem, startDate time.Time, endDate time.
 
 		res = append(res, val)
 
-		fTime.Add(time.Hour * 24)
+		fTime = fTime.Add(time.Hour * 24)
 	}
 
 	return res
@@ -46,42 +45,13 @@ func runningDistanceToDayKm(ri []RunningItem, startDate time.Time, endDate time.
 func drawChart(goalKm, totalDays uint, daysKm []float64) (*bytes.Buffer, error) {
 	defaultChartData := chart.ContinuousSeries{
 		Name: "Chart name",
-		Style: chart.Style{
-			Show: true,
-			Padding: chart.Box{
-				Top:    200,
-				Left:   200,
-				Right:  200,
-				Bottom: 200,
-				IsSet:  false,
-			},
-			StrokeWidth:         3,
-			StrokeColor:         drawing.Color{},
-			StrokeDashArray:     nil,
-			DotColor:            drawing.Color{},
-			DotWidth:            0,
-			DotWidthProvider:    nil,
-			DotColorProvider:    nil,
-			FillColor:           drawing.Color{},
-			FontSize:            0,
-			FontColor:           drawing.Color{},
-			Font:                nil,
-			TextHorizontalAlign: 0,
-			TextVerticalAlign:   0,
-			TextWrap:            0,
-			TextLineSpacing:     0,
-			TextRotationDegrees: 0,
-		},
-		YAxis:           0,
-		XValueFormatter: nil,
-		YValueFormatter: nil,
-		XValues:         nil,
-		YValues:         nil,
 	}
 
 	chart1 := defaultChartData
 	chart1.YValues = []float64{float64(goalKm), float64(goalKm)}
 	chart1.XValues = []float64{0, float64(totalDays)}
+	chart1.Style.StrokeColor = chart.ColorRed
+	chart1.Style.Show = true
 
 	xVals := make([]float64, 0, totalDays)
 	yVals := make([]float64, 0, totalDays)
@@ -97,12 +67,45 @@ func drawChart(goalKm, totalDays uint, daysKm []float64) (*bytes.Buffer, error) 
 	chart2 := defaultChartData
 	chart2.YValues = yVals
 	chart2.XValues = xVals
+	chart2.Style.Show = true
+	chart2.Style.StrokeWidth = 2
+	chart2.Style.StrokeColor = chart.ColorBlue
+	chart2.Style.DotWidth = 3
+	chart2.Style.DotColor = chart.ColorBlue
 
 	graph := chart.Chart{
+		Title: "Your running progress",
+		TitleStyle: chart.Style{
+			Show:     true,
+			FontSize: 20,
+		},
+		ColorPalette: nil,
+		Width:        0,
+		Height:       0,
+		DPI:          0,
+		Background:   chart.Style{},
+		Canvas:       chart.Style{},
+		XAxis: chart.XAxis{
+			Name: "Days from start",
+			Style: chart.Style{
+				Show:     true,
+				FontSize: 5,
+			},
+		},
+		YAxis: chart.YAxis{
+			Name: "Count of KM",
+			Style: chart.Style{
+				Show:     true,
+				FontSize: 5,
+			},
+		},
+		YAxisSecondary: chart.YAxis{},
+		Font:           nil,
 		Series: []chart.Series{
 			chart1,
 			chart2,
 		},
+		Elements: nil,
 	}
 
 	buffer := bytes.NewBuffer([]byte{})
