@@ -10,22 +10,42 @@ const (
 	medal1, medal2, medal3, medalCommon = "🥇", "🥈", "🥉", "🎗"
 )
 
-func removeMessageDistanceMsg(removedDistance, currentDistance, goal float64, leftDays int) string {
-	perDay := (goal - currentDistance) / float64(leftDays)
+func getPerDay(currentDistance, goal float64, leftDays int) float64 {
+	res := (goal - currentDistance) / float64(leftDays)
 
-	return fmt.Sprintf("Removed distance %.2f.\nCurrent distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", removedDistance, currentDistance, goal-currentDistance, perDay)
+	if res < 0 {
+		return 0
+	}
+
+	return res
+}
+
+func getLeftToGoal(goal, currentDistance float64) float64 {
+	res := goal - currentDistance
+
+	if res < 0 {
+		return 0
+	}
+
+	return res
+}
+
+func removeMessageDistanceMsg(removedDistance, currentDistance, goal float64, leftDays int) string {
+	perDay := getPerDay(currentDistance, goal, leftDays)
+
+	return fmt.Sprintf("Removed distance %.2f.\nCurrent distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", removedDistance, currentDistance, getLeftToGoal(goal, currentDistance), perDay)
 }
 
 func registerMessageDistanceMsg(registeredDistance, currentDistance, goal float64, leftDays int) string {
-	perDay := (goal - currentDistance) / float64(leftDays)
+	perDay := getPerDay(currentDistance, goal, leftDays)
 
-	return fmt.Sprintf("Registered distance %.2fkm.\nCurrent distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", registeredDistance, currentDistance, goal-currentDistance, perDay)
+	return fmt.Sprintf("Registered distance %.2fkm.\nCurrent distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", registeredDistance, currentDistance, getLeftToGoal(goal, currentDistance), perDay)
 }
 
 func myMessageDistanceMsg(currentDistance, goal float64, leftDays int) string {
-	perDay := (goal - currentDistance) / float64(leftDays)
+	perDay := getPerDay(currentDistance, goal, leftDays)
 
-	return fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", currentDistance, goal-currentDistance, perDay)
+	return fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", currentDistance, getLeftToGoal(goal, currentDistance), perDay)
 }
 
 type sortingDat struct {
