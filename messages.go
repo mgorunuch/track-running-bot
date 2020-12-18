@@ -39,13 +39,22 @@ func removeMessageDistanceMsg(removedDistance, currentDistance, goal float64, le
 func registerMessageDistanceMsg(registeredDistance, currentDistance, goal float64, leftDays int) string {
 	perDay := getPerDay(currentDistance, goal, leftDays)
 
+	if getLeftToGoal(goal, currentDistance) <= 0 {
+		return fmt.Sprintf("Registered distance %.2fkm.\n\U0001F973 CONGRATULATIONS 🎉\nYou achieved goal", registeredDistance)
+	}
+
 	return fmt.Sprintf("Registered distance %.2fkm.\nCurrent distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", registeredDistance, currentDistance, getLeftToGoal(goal, currentDistance), perDay)
 }
 
 func myMessageDistanceMsg(currentDistance, goal float64, leftDays int) string {
 	perDay := getPerDay(currentDistance, goal, leftDays)
+	base := ""
 
-	return fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", currentDistance, getLeftToGoal(goal, currentDistance), perDay)
+	if getLeftToGoal(goal, currentDistance) <= 0 {
+		base = fmt.Sprintf("\U0001F973 CONGRATULATIONS 🎉\nYou achieved goal\n\n")
+	}
+
+	return base + fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", currentDistance, getLeftToGoal(goal, currentDistance), perDay)
 }
 
 type sortingDat struct {
