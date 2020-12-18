@@ -40,7 +40,7 @@ func registerMessageDistanceMsg(registeredDistance, currentDistance, goal float6
 	perDay := getPerDay(currentDistance, goal, leftDays)
 
 	if getLeftToGoal(goal, currentDistance) <= 0 {
-		return fmt.Sprintf("Registered distance %.2fkm.\n\U0001F973 CONGRATULATIONS 🎉\nYou achieved goal", registeredDistance)
+		return fmt.Sprintf("Registered distance %.2fkm.\n\n\U0001F973 <b>CONGRATULATIONS</b> 🎉\nYou achieved your goal", registeredDistance)
 	}
 
 	return fmt.Sprintf("Registered distance %.2fkm.\nCurrent distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", registeredDistance, currentDistance, getLeftToGoal(goal, currentDistance), perDay)
@@ -51,7 +51,7 @@ func myMessageDistanceMsg(currentDistance, goal float64, leftDays int) string {
 	base := ""
 
 	if getLeftToGoal(goal, currentDistance) <= 0 {
-		base = fmt.Sprintf("\U0001F973 CONGRATULATIONS 🎉\nYou achieved goal\n\n")
+		base = fmt.Sprintf("\U0001F973 <b>CONGRATULATIONS</b> 🎉\nYou achieved your goal")
 	}
 
 	return base + fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\n<i>Per day</i>: <b>%.2fkm</b>", currentDistance, getLeftToGoal(goal, currentDistance), perDay)
