@@ -79,7 +79,8 @@ func registerDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) 
 	currNum := store[fromID]
 
 	if currNum >= goal {
-		tgbotapi.NewAnimationShare(update.Message.Chat.ID, "AAMCBAADGQEAAQdOK1_csxiJI4oWIVix_SHZGmpSNs7DAAJlAgACq4vtUQfZi8l57l_HwNGxKF0AAwEAB20AA6JfAAIeBA")
+		animMsg := tgbotapi.NewAnimationShare(update.Message.Chat.ID, "AAMCBAADGQEAAQdOK1_csxiJI4oWIVix_SHZGmpSNs7DAAJlAgACq4vtUQfZi8l57l_HwNGxKF0AAwEAB20AA6JfAAIeBA")
+		bot.Send(animMsg)
 	}
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, registerMessageDistanceMsg(numb, currNum, goal, leftDays()))
