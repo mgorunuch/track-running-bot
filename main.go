@@ -80,14 +80,20 @@ func registerDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) 
 
 	if currNum >= goal {
 		animMsg := tgbotapi.NewAnimationShare(update.Message.Chat.ID, "AAMCBAADGQEAAQdOK1_csxiJI4oWIVix_SHZGmpSNs7DAAJlAgACq4vtUQfZi8l57l_HwNGxKF0AAwEAB20AA6JfAAIeBA")
-		bot.Send(animMsg)
+		_, err = bot.Send(animMsg)
+		if err != nil {
+			log.Print(err)
+		}
 	}
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, registerMessageDistanceMsg(numb, currNum, goal, leftDays()))
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
 
-	bot.Send(msg)
+	_, err = bot.Send(msg)
+	if err != nil {
+		log.Print(err)
+	}
 }
 
 func removeDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
