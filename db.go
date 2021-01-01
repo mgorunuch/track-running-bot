@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 )
 
@@ -26,7 +25,14 @@ func refreshData(db *sql.DB) error {
 	store = map[int]float64{}
 	names = map[int]string{}
 
-	rows, err := db.Query(`select telegram_id, sum(distance) as distance, (select name from data dt where dt.telegram_id = data.telegram_id order by created_at desc limit 1) as name from data group by telegram_id`)
+	rows, err := db.Query(`
+		select telegram_id,
+		       sum(distance) as distance,
+		       (select name from data dt where dt.telegram_id = data.telegram_id order by created_at desc limit 1) as name
+		from data
+		where created_at > $1
+		group by telegram_id
+	`, startDate)
 	if err != nil {
 		return err
 	}
@@ -60,7 +66,13 @@ type RunningItem struct {
 }
 
 func getSingleUserData(db *sql.DB, tgID int) ([]RunningItem, error) {
-	rows, err := db.Query(`select created_at, distance from data where telegram_id = ` + fmt.Sprint(tgID))
+	rows, err := db.Query(`
+		select created_at,
+		       distance
+		from data
+		where telegram_id = $1
+		  and created_at > $2
+	`, tgID, startDate)
 	if err != nil {
 		return nil, err
 	}
