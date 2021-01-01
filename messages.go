@@ -5,6 +5,7 @@ import (
 	"math"
 	"sort"
 	"strings"
+	"time"
 )
 
 const (
@@ -32,7 +33,7 @@ func getLeftToGoal(goal, currentDistance float64) float64 {
 }
 
 func getLeftDays() (int, int) {
-	res := goalEnd.Sub(startDate)
+	res := goalEnd.Sub(time.Now())
 
 	hrs := res.Hours()
 	if hrs < 0 {
