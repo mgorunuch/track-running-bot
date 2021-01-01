@@ -36,7 +36,7 @@ var names = map[int]string{}
 
 const goal float64 = 1000.0
 
-var startDate = time.Date(2021, 0, 0, 0, 0, 0, 0, time.UTC)
+var startDate = time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
 var goalEnd = time.Date(2021, 12, 31, 23, 59, 59, 0, time.UTC)
 
 func leftDays() int {
