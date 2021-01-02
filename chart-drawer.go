@@ -56,6 +56,10 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 
 		xVals = append(xVals, res)
 		yVals = append(yVals, i)
+
+		if res == 0 {
+			break
+		}
 	}
 
 	chart2 := defaultChartData
