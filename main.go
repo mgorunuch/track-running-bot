@@ -44,6 +44,8 @@ func leftDays() int {
 }
 
 func registerDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
+	fmt.Print("Started: registerDistance")
+
 	fromID := update.Message.From.ID
 
 	dirtyParts := strings.Split(update.Message.Text, " ")
@@ -97,6 +99,8 @@ func registerDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) 
 }
 
 func removeDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
+	fmt.Print("Started: removeDistance")
+
 	fromID := update.Message.From.ID
 
 	dirtyParts := strings.Split(update.Message.Text, " ")
@@ -135,6 +139,8 @@ func removeDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 }
 
 func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
+	fmt.Print("Started: myDistance")
+
 	fromID := update.Message.From.ID
 
 	currDistance := 0.0
@@ -185,6 +191,8 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 }
 
 func avgPrediction(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
+	fmt.Print("Started: avgPrediction")
+
 	fromID := update.Message.From.ID
 
 	currDistance := 0.0
@@ -229,6 +237,8 @@ func avgPrediction(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 }
 
 func distanceStats(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
+	fmt.Print("Started: distanceStats")
+
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, statsMessageDistanceMsg(store, names, goal, leftDays()))
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
