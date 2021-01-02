@@ -47,7 +47,6 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 
 	xVals := make([]float64, daysCount)
 	yVals := make([]float64, daysCount)
-	resCharts := make([]chart.Series, 1)
 
 	for i := 1.0; i <= float64(daysCount); i += 1 {
 		res := (float64(goal) - (i * avgPerDay)) / (float64(daysCount) - i)
@@ -67,8 +66,6 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 	chart2.Style.DotWidth = 3
 	chart2.Style.StrokeColor = chart.ColorBlue
 	chart2.Style.DotColor = chart.ColorBlue
-
-	resCharts[0] = chart2
 
 	graph := chart.Chart{
 		Title: "Your running formula prediction",
@@ -98,12 +95,8 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 		},
 		YAxisSecondary: chart.YAxis{},
 		Font:           nil,
-		Series:         []chart.Series{},
+		Series:         []chart.Series{chart2},
 		Elements:       nil,
-	}
-
-	for _, c := range resCharts {
-		graph.Series = append(graph.Series, c)
 	}
 
 	buffer := bytes.NewBuffer([]byte{})

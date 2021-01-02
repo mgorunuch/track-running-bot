@@ -203,6 +203,8 @@ func avgPrediction(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 		fmt.Printf("%+v", err)
 
 		return
+	} else {
+		fmt.Print("ERROR: ", err)
 	}
 
 	bts := tgbotapi.FileBytes{
