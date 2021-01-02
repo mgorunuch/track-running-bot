@@ -344,12 +344,12 @@ func main() {
 				removeDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/remove_distance"):
 				removeDistance(update, bot, db)
-			case strings.HasPrefix(update.Message.Text, "/my"):
-				myDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/my_distance"):
 				myDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/my_avgpred"):
 				avgPrediction(update, bot, db)
+			case strings.HasPrefix(update.Message.Text, "/my"):
+				myDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/stats"):
 				distanceStats(update, bot, db)
 			}
