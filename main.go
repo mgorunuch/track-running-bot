@@ -196,15 +196,7 @@ func avgPrediction(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	msg.ReplyToMessageID = update.Message.MessageID
 	msg.ParseMode = tgbotapi.ModeHTML
 
-	totalDistance, err := getSingleUserSum(db, fromID)
-	if err != nil {
-		bot.Send(msg)
-		fmt.Printf("%+v", err)
-
-		return
-	}
-
-	avgPerDay := totalDistance / float64(leftDays())
+	avgPerDay := currDistance / float64(leftDays())
 	buffer, err := drawSuccessPredChard(int(goal), 365, avgPerDay)
 	if err != nil {
 		bot.Send(msg)
