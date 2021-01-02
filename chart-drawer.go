@@ -40,6 +40,81 @@ func runningDistanceToDayKm(ri []RunningItem, startDate time.Time, endDate time.
 	return res
 }
 
+func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer, error) {
+	defaultChartData := chart.ContinuousSeries{
+		Name: "Chart name",
+	}
+
+	xVals := make([]float64, daysCount)
+	yVals := make([]float64, daysCount)
+	resCharts := make([]chart.Series, 1)
+
+	for i := 1.0; i <= float64(daysCount); i += 1 {
+		res := (float64(goal) - (i * avgPerDay)) / (float64(daysCount) - i)
+		if res < 0 {
+			res = 0
+		}
+
+		xVals = append(xVals, res)
+		yVals = append(yVals, i)
+	}
+
+	chart2 := defaultChartData
+	chart2.YValues = yVals
+	chart2.XValues = xVals
+	chart2.Style.Show = true
+	chart2.Style.StrokeWidth = 2
+	chart2.Style.DotWidth = 3
+	chart2.Style.StrokeColor = chart.ColorBlue
+	chart2.Style.DotColor = chart.ColorBlue
+
+	resCharts[0] = chart2
+
+	graph := chart.Chart{
+		Title: "Your running formula prediction",
+		TitleStyle: chart.Style{
+			Show:     true,
+			FontSize: 20,
+		},
+		ColorPalette: nil,
+		Width:        0,
+		Height:       0,
+		DPI:          0,
+		Background:   chart.Style{},
+		Canvas:       chart.Style{},
+		XAxis: chart.XAxis{
+			Name: "Days from start",
+			Style: chart.Style{
+				Show:     true,
+				FontSize: 5,
+			},
+		},
+		YAxis: chart.YAxis{
+			Name: "Count of KM",
+			Style: chart.Style{
+				Show:     true,
+				FontSize: 5,
+			},
+		},
+		YAxisSecondary: chart.YAxis{},
+		Font:           nil,
+		Series:         []chart.Series{},
+		Elements:       nil,
+	}
+
+	for _, c := range resCharts {
+		graph.Series = append(graph.Series, c)
+	}
+
+	buffer := bytes.NewBuffer([]byte{})
+	err := graph.Render(chart.PNG, buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	return buffer, err
+}
+
 func drawChart(goalKm, totalDays uint, daysKm [][]float64) (*bytes.Buffer, error) {
 	defaultChartData := chart.ContinuousSeries{
 		Name: "Chart name",

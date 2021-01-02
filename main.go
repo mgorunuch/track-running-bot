@@ -184,6 +184,56 @@ func myDistance(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	fmt.Printf("%+v", res)
 }
 
+func avgPrediction(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
+	fromID := update.Message.From.ID
+
+	currDistance := 0.0
+	if v, ok := store[fromID]; ok {
+		currDistance = v
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, myMessageDistanceMsg(currDistance, goal, leftDays()))
+	msg.ReplyToMessageID = update.Message.MessageID
+	msg.ParseMode = tgbotapi.ModeHTML
+
+	totalDistance, err := getSingleUserSum(db, fromID)
+	if err != nil {
+		bot.Send(msg)
+		fmt.Printf("%+v", err)
+
+		return
+	}
+
+	avgPerDay := totalDistance / float64(leftDays())
+	buffer, err := drawSuccessPredChard(int(goal), 365, avgPerDay)
+	if err != nil {
+		bot.Send(msg)
+		fmt.Printf("%+v", err)
+
+		return
+	}
+
+	bts := tgbotapi.FileBytes{
+		Name:  time.Now().String() + ".png",
+		Bytes: buffer.Bytes(),
+	}
+
+	res, err := bot.UploadFile("sendPhoto", map[string]string{
+		"chat_id":             fmt.Sprint(msg.ChatID),
+		"caption":             msg.Text,
+		"parse_mode":          msg.ParseMode,
+		"reply_to_message_id": fmt.Sprint(msg.ReplyToMessageID),
+	}, "photo", bts)
+	if err != nil {
+		bot.Send(msg)
+		fmt.Printf("%+v", err)
+
+		return
+	}
+
+	fmt.Printf("%+v", res)
+}
+
 func distanceStats(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *sql.DB) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, statsMessageDistanceMsg(store, names, goal, leftDays()))
 	msg.ReplyToMessageID = update.Message.MessageID
@@ -298,6 +348,8 @@ func main() {
 				myDistance(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/my_distance"):
 				myDistance(update, bot, db)
+			case strings.HasPrefix(update.Message.Text, "/my_avgpred"):
+				avgPrediction(update, bot, db)
 			case strings.HasPrefix(update.Message.Text, "/stats"):
 				distanceStats(update, bot, db)
 			}

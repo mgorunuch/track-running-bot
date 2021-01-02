@@ -103,6 +103,33 @@ func getSingleUserData(db *sql.DB, tgID int) ([]RunningItem, error) {
 	return dt, nil
 }
 
+func getSingleUserSum(db *sql.DB, tgID int) (float64, error) {
+	rows, err := db.Query(`
+		select sum(distance)
+		from data
+		where telegram_id = $1
+		  and created_at > $2
+	`, tgID, startDate)
+	if err != nil {
+		return 0, err
+	}
+
+	if rows.Err() != nil {
+		return 0, rows.Err()
+	}
+
+	var res float64
+
+	for rows.Next() {
+		err = rows.Scan(&res)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return res, nil
+}
+
 func insertData(db *sql.DB, id int, distance float64, name string) error {
 	_, err := db.Exec(`insert into data (telegram_id, distance, name) values ($1, $2, $3);`, id, distance, name)
 	if err != nil {
