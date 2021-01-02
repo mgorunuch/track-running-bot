@@ -31,7 +31,7 @@ func Test_images(t *testing.T) {
 }
 
 func Test_123(t *testing.T) {
-	res, err := drawSuccessPredChard(1000, 365, 3.65)
+	res, err := drawSuccessPredChard(1000, 365, 3.65, 50)
 
 	fl, err := os.OpenFile("name.png", os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	defer fl.Close()

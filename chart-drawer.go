@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"math"
 	"time"
 
@@ -42,13 +43,15 @@ func runningDistanceToDayKm(ri []RunningItem, startDate time.Time, endDate time.
 	return res
 }
 
-func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer, error) {
+func drawSuccessPredChard(goal, daysCount int, avgPerDay float64, currentDay float64) (*bytes.Buffer, error) {
 	defaultChartData := chart.ContinuousSeries{
 		Name: "Chart name",
 	}
 
+	chart3 := defaultChartData
+
 	xTicks := make([]chart.Tick, 0, daysCount)
-	for i := 1.0; i <= float64(daysCount); i += 10 {
+	for i := 0.0; i <= float64(daysCount); i += 10 {
 		xTicks = append(xTicks, chart.Tick{
 			Value: i,
 			Label: fmt.Sprint(i),
@@ -73,10 +76,19 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 	xVals := make([]float64, daysCount)
 	yVals := make([]float64, daysCount)
 
-	for i := 1.0; i <= float64(daysCount); i += 1 {
+	for i := 0.0; i <= float64(daysCount); i += 1 {
 		res := (float64(goal) - (i * avgPerDay)) / (float64(daysCount) - i)
 		if res < 0 {
 			res = 0
+		}
+
+		if i == currentDay {
+			chart3.YValues = []float64{res, res}
+			chart3.XValues = []float64{i, i}
+			log.Print(chart3.XValues, chart3.YValues)
+			chart3.Style.Show = true
+			chart3.Style.DotColor = chart.ColorRed
+			chart3.Style.DotWidth = 3
 		}
 
 		xVals = append(xVals, i)
@@ -120,7 +132,7 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 		},
 		YAxisSecondary: chart.YAxis{},
 		Font:           nil,
-		Series:         []chart.Series{chart2},
+		Series:         []chart.Series{chart2, chart3},
 		Elements:       nil,
 	}
 
