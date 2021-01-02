@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"math"
 	"time"
 
 	"github.com/wcharczuk/go-chart/drawing"
@@ -45,6 +47,29 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 		Name: "Chart name",
 	}
 
+	xTicks := make([]chart.Tick, 0, daysCount)
+	for i := 1.0; i <= float64(daysCount); i += 10 {
+		xTicks = append(xTicks, chart.Tick{
+			Value: i,
+			Label: fmt.Sprint(i),
+		})
+	}
+	if xTicks[len(xTicks)-1].Value != float64(daysCount) {
+		xTicks = append(xTicks, chart.Tick{
+			Value: float64(daysCount),
+			Label: fmt.Sprint(daysCount),
+		})
+	}
+
+	ceilAvg := math.Ceil((float64(goal) - (1 * avgPerDay)) / (float64(daysCount) - 1))
+	yTicks := make([]chart.Tick, 0, daysCount)
+	for i := 0.0; i <= ceilAvg; i += 1 {
+		yTicks = append(yTicks, chart.Tick{
+			Value: i,
+			Label: fmt.Sprint(i),
+		})
+	}
+
 	xVals := make([]float64, daysCount)
 	yVals := make([]float64, daysCount)
 
@@ -54,12 +79,8 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 			res = 0
 		}
 
-		xVals = append(xVals, res)
-		yVals = append(yVals, i)
-
-		if res == 0 {
-			break
-		}
+		xVals = append(xVals, i)
+		yVals = append(yVals, res)
 	}
 
 	chart2 := defaultChartData
@@ -67,7 +88,7 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 	chart2.XValues = xVals
 	chart2.Style.Show = true
 	chart2.Style.StrokeWidth = 2
-	chart2.Style.DotWidth = 3
+	chart2.Style.DotWidth = 0
 	chart2.Style.StrokeColor = chart.ColorBlue
 	chart2.Style.DotColor = chart.ColorBlue
 
@@ -84,14 +105,14 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64) (*bytes.Buffer
 		Background:   chart.Style{},
 		Canvas:       chart.Style{},
 		XAxis: chart.XAxis{
-			Name: "Days from start",
+			Ticks: xTicks,
 			Style: chart.Style{
 				Show:     true,
 				FontSize: 5,
 			},
 		},
 		YAxis: chart.YAxis{
-			Name: "Count of KM",
+			Ticks: yTicks,
 			Style: chart.Style{
 				Show:     true,
 				FontSize: 5,
