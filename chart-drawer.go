@@ -77,12 +77,7 @@ func drawSuccessPredChard(goal, daysCount int, avgPerDay float64, currentDay flo
 	yVals := make([]float64, daysCount)
 
 	for i := 0.0; i <= float64(daysCount); i += 1 {
-		var res float64
-		if float64(daysCount)-i != 0 {
-			res = (float64(goal) - (i * avgPerDay)) / (float64(daysCount) - i)
-		} else {
-			res = 0
-		}
+		res := (float64(goal) - (i * avgPerDay)) / (float64(daysCount) - i)
 
 		if res < 0 {
 			res = 0
