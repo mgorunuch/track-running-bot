@@ -73,7 +73,9 @@ func myMessageDistanceMsg(currentDistance, goal float64, leftDays int) string {
 	leftToGoal := getLeftToGoal(goal, currentDistance)
 	avgPerDay := currentDistance / (totalDays - float64(days))
 
-	return base + fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\nLeft time: %d day %d hours\n<i>Per day</i>: <b>%.5fkm</b>\n<i>Avg per day:</i>: %.3fkm", currentDistance, leftToGoal, days, hrs, perDay, avgPerDay)
+	currentPercent := currentDistance / (goal / 100)
+
+	return base + fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\nLeft time: %d day %d hours\n<i>Per day</i>: <b>%.5fkm</b>\n<i>Avg per day:</i>: %.3fkm\n<i>Ready perc</i>: %.3f%", currentDistance, leftToGoal, days, hrs, perDay, avgPerDay, currentPercent)
 }
 
 type sortingDat struct {
