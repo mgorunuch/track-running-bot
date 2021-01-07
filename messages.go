@@ -57,7 +57,7 @@ func registerMessageDistanceMsg(registeredDistance, currentDistance, goal float6
 		return fmt.Sprintf("Registered distance %.2fkm.\n\n\U0001F973 <b>CONGRATULATIONS</b> 🎉\nYou achieved your goal", registeredDistance)
 	}
 
-	return fmt.Sprintf("Registered distance %.2fkm.\n", registeredDistance) + myMessageDistanceMsg(currentDistance, goal, leftDays)
+	return fmt.Sprintf("Registered distance %.2fkm.\n\n", registeredDistance) + myMessageDistanceMsg(currentDistance, goal, leftDays)
 }
 
 func myMessageDistanceMsg(currentDistance, goal float64, leftDays int) string {
@@ -75,7 +75,7 @@ func myMessageDistanceMsg(currentDistance, goal float64, leftDays int) string {
 
 	currentPercent := currentDistance / (goal / 100)
 
-	return base + fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\nLeft time: %d day %d hours\n<i>Per day</i>: <b>%.5fkm</b>\n<i>Avg per day:</i>: %.3fkm\n<i>Ready perc</i>: %.3f%", currentDistance, leftToGoal, days, hrs, perDay, avgPerDay, currentPercent)
+	return base + fmt.Sprintf("Your current distance is: %.2fkm\n\nLeft to goal: <b>%.2fkm</b>\nLeft time: %d day %d hours\n\n<i>Per day</i>: <b>%.5fkm</b>\n<i>Avg per day:</i>: %.3fkm\n<i>Ready perc</i>: %.3f%%", currentDistance, leftToGoal, days, hrs, perDay, avgPerDay, currentPercent)
 }
 
 type sortingDat struct {
