@@ -53,15 +53,11 @@ func removeMessageDistanceMsg(removedDistance, currentDistance, goal float64, le
 }
 
 func registerMessageDistanceMsg(registeredDistance, currentDistance, goal float64, leftDays int) string {
-	perDay := getPerDay(currentDistance, goal, leftDays)
-
-	days, hrs := getLeftDays()
-
 	if getLeftToGoal(goal, currentDistance) <= 0 {
 		return fmt.Sprintf("Registered distance %.2fkm.\n\n\U0001F973 <b>CONGRATULATIONS</b> 🎉\nYou achieved your goal", registeredDistance)
 	}
 
-	return fmt.Sprintf("Registered distance %.2fkm.\nCurrent distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\nLeft time: %d day %d hours\n<i>Per day</i>: <b>%.2fkm</b>", registeredDistance, currentDistance, getLeftToGoal(goal, currentDistance), days, hrs, perDay)
+	return fmt.Sprintf("Registered distance %.2fkm.\n", registeredDistance) + myMessageDistanceMsg(currentDistance, goal, leftDays)
 }
 
 func myMessageDistanceMsg(currentDistance, goal float64, leftDays int) string {
@@ -74,7 +70,10 @@ func myMessageDistanceMsg(currentDistance, goal float64, leftDays int) string {
 		base = fmt.Sprintf("\U0001F973 <b>CONGRATULATIONS</b> 🎉\nYou achieved your goal\n\n")
 	}
 
-	return base + fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\nLeft time: %d day %d hours\n<i>Per day</i>: <b>%.2fkm</b>", currentDistance, getLeftToGoal(goal, currentDistance), days, hrs, perDay)
+	leftToGoal := getLeftToGoal(goal, currentDistance)
+	avgPerDay := currentDistance / (totalDays - float64(days))
+
+	return base + fmt.Sprintf("Your current distance is: %.2fkm\nLeft to goal: <b>%.2fkm</b>\nLeft time: %d day %d hours\n<i>Per day</i>: <b>%.5fkm</b>\n<i>Avg per day:</i>: %.3fkm", currentDistance, leftToGoal, days, hrs, perDay, avgPerDay)
 }
 
 type sortingDat struct {
