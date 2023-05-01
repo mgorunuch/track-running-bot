@@ -35,10 +35,10 @@ func maxFl(v1 float64, v2 float64) float64 {
 var store = map[int]float64{}
 var names = map[int]string{}
 
-const goal float64 = 1000.0
+const goal float64 = 700.0
 
-var startDate = time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
-var goalEnd = time.Date(2021, 12, 31, 23, 59, 59, 0, time.UTC)
+var startDate = time.Date(2023, 5, 1, 0, 0, 0, 0, time.UTC)
+var goalEnd = time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC)
 var totalDays = math.Ceil(goalEnd.Sub(startDate).Hours() / 24)
 
 func leftDays() int {
